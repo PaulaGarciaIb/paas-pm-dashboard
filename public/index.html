@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Interactivo de Proyecto - Evaluación PaaS</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 750px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+        .status-badge { display: inline-block; background: #2ecc71; color: white; padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .card { background: #ebf5fb; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; }
+        .card h3 { margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; }
+        .card p { margin: 0; font-size: 20px; font-weight: bold; color: #2c3e50; }
+        .add-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .add-box input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .add-box button { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .add-box button:hover { background: #2980b9; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { background: #f8f9fa; padding: 10px 15px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #e9ecef; }
+        .timer { margin-top: 20px; font-size: 13px; color: #7f8c8d; background: #f8f9fa; padding: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Panel de Gestión del Proyecto</h1>
+        <p><strong>Servidor PaaS:</strong> <span class="status-badge">ONLINE</span></p>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Progreso General</h3>
+                <p id="progreso">0%</p>
+            </div>
+            <div class="card">
+                <h3>Tareas Completadas</h3>
+                <p id="tareasCount">0 / 0</p>
+            </div>
+        </div>
+
+        <h3>Añadir nueva tarea al Sprint:</h3>
+        <div class="add-box">
+            <input type="text" id="taskInput" placeholder="Ej: Redactar conclusiones del informe..." />
+            <button onclick="agregarTarea()">Añadir Tarea</button>
+        </div>
+
+        <h3>Lista de Tareas Activas:</h3>
+        <ul id="taskList"></ul>
+
+        <div class="timer">
+            ⏱️ <strong>Hora respuesta servidor:</strong> <span id="timestamp">Consultando...</span>
+        </div>
+    </div>
+
+    <script>
+        function cargarEstado() {
+            const startTime = performance.now();
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    const endTime = performance.now();
+                    const latency = Math.round(endTime - startTime);
+                    
+                    document.getElementById('progreso').textContent = data.progreso + '%';
+                    document.getElementById('tareasCount').textContent = `${data.completadas} / ${data.total}`;
+                    document.getElementById('timestamp').textContent = `${data.servidorTimestamp} (Latencia: ${latency} ms)`;
+                    
+                    const list = document.getElementById('taskList');
+                    list.innerHTML = '';
+                    data.tareas.forEach(t => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${t.texto}</span> <strong>${t.completada ? '✅ Hecho' : '⏳ En proceso'}</strong>`;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function agregarTarea() {
+            const input = document.getElementById('taskInput');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texto: texto })
+            })
+            .then(res => res.json())
+            .then(() => {
+                input.value = '';
+                cargarEstado();
+            });
+        }
+
+        cargarEstado();
+    </script>
+</body>
+</html>
