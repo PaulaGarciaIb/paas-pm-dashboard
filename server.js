@@ -7,15 +7,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Estado inicial del proyecto
 let tareas = [
-    { id: 1, texto: 'Definición de requisitos y SLA', completada: true },
-    { id: 2, texto: 'Configuración del repositorio GitHub', completada: true },
+    { id: 1, texto: 'Definición de requisitos del sistema y SLA', completada: true },
+    { id: 2, texto: 'Configuración del repositorio remoto en GitHub', completada: true },
     { id: 3, texto: 'Pruebas de latencia y Cold Start en Render', completada: false },
     { id: 4, texto: 'Auditoría de despliegue en Vercel y Railway', completada: false }
 ];
 
-// Endpoint GET: Obtener estado global
 app.get('/api/status', (req, res) => {
     const completadas = tareas.filter(t => t.completada).length;
     res.json({
@@ -30,7 +28,6 @@ app.get('/api/status', (req, res) => {
     });
 });
 
-// Endpoint POST: Crear nueva tarea
 app.post('/api/tasks', (req, res) => {
     const { texto } = req.body;
     if (texto) {
@@ -41,7 +38,6 @@ app.post('/api/tasks', (req, res) => {
     res.status(400).json({ error: 'El texto es obligatorio' });
 });
 
-// Endpoint PUT: Alternar estado de completada / pendiente
 app.put('/api/tasks/:id/toggle', (req, res) => {
     const id = Number(req.params.id);
     const tarea = tareas.find(t => t.id === id);
@@ -52,7 +48,6 @@ app.put('/api/tasks/:id/toggle', (req, res) => {
     res.status(404).json({ error: 'Tarea no encontrada' });
 });
 
-// Endpoint DELETE: Eliminar una tarea
 app.delete('/api/tasks/:id', (req, res) => {
     const id = Number(req.params.id);
     tareas = tareas.filter(t => t.id !== id);
