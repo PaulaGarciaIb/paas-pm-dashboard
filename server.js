@@ -8,8 +8,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 let tareas = [
-    { id: 1, texto: 'Configurar repositorio en GitHub', completada: true },
-    { id: 2, texto: 'Evaluar despliegue en Render, Railway y Vercel', completada: false }
+    { id: 1, texto: 'Definición de requisitos del sistema y SLA', completada: true },
+    { id: 2, texto: 'Configuración del repositorio remoto en GitHub', completada: true },
+    { id: 3, texto: 'Pruebas de latencia y Cold Start en Render', completada: false },
+    { id: 4, texto: 'Auditoría de despliegue en Vercel y Railway', completada: false }
 ];
 
 app.get('/api/status', (req, res) => {
