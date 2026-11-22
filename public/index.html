@@ -98,26 +98,34 @@
         </div>
     </div>
 
-    <script>
-        const tareasIniciales = [
-            { id: 1, texto: 'Definición de requisitos del sistema y SLA', completada: true },
-            { id: 2, texto: 'Configuración del repositorio remoto en GitHub', completada: true },
-            { id: 3, texto: 'Pruebas de latencia y Cold Start en Render', completada: false },
-            { id: 4, texto: 'Auditoría de despliegue en Vercel y Railway', completada: false }
-        ];
+<script>
+    // 🔘 INTERRUPTOR: 
+    // false = Sin localStorage (para hacer las capturas de la memoria sin datos guardados)
+    // true  = Con localStorage (para usar en clase durante la presentación)
+    const USAR_LOCALSTORAGE = true; 
 
-        function obtenerTareasLocal() {
-            const guardadas = localStorage.getItem('paas_pm_tareas');
-            if (guardadas) {
-                return JSON.parse(guardadas);
-            }
-            localStorage.setItem('paas_pm_tareas', JSON.stringify(tareasIniciales));
-            return tareasIniciales;
-        }
+    const tareasIniciales = [
+        { id: 1, texto: 'Definición de requisitos del sistema y SLA', completada: true },
+        { id: 2, texto: 'Configuración del repositorio remoto en GitHub', completada: true },
+        { id: 3, texto: 'Pruebas de latencia y Cold Start en Render', completada: false },
+        { id: 4, texto: 'Auditoría de despliegue en Vercel y Railway', completada: false }
+    ];
 
-        function guardarTareasLocal(tareas) {
+    function obtenerTareasLocal() {
+        if (!USAR_LOCALSTORAGE) return tareasIniciales;
+        
+        const guardadas = localStorage.getItem('paas_pm_tareas');
+        if (guardadas) return JSON.parse(guardadas);
+        
+        localStorage.setItem('paas_pm_tareas', JSON.stringify(tareasIniciales));
+        return tareasIniciales;
+    }
+
+    function guardarTareasLocal(tareas) {
+        if (USAR_LOCALSTORAGE) {
             localStorage.setItem('paas_pm_tareas', JSON.stringify(tareas));
         }
+    }
 
         function renderizar() {
             const tareas = obtenerTareasLocal();
